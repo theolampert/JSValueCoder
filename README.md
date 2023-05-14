@@ -1,5 +1,7 @@
 ### JSValueCoder
 
+![Test](https://github.com/theolampert/JSValueCoder/actions/workflows/swift.yml/badge.svg)
+
 Codable implementation for JavascriptCore's `JSValue`
 
 #### Usage:
