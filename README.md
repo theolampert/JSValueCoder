@@ -27,3 +27,7 @@ let decoder = JSValueDecoder()
 let jsValue = try encoder.encode(user, in: context)
 let decoded = try decoder.decode(User.self, from: jsValue)
 ```
+
+
+#### Notes:
+This was originally forked from here https://github.com/byss/KBJSValueCoding and support was added for nested structs and arrays and tests added.
