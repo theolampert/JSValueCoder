@@ -30,4 +30,4 @@ let decoded = try decoder.decode(User.self, from: jsValue)
 
 
 #### Notes:
-This was originally forked from here https://github.com/byss/KBJSValueCoding and support was added for nested structs and arrays and tests added.
+This was based off of work done here [here](https://github.com/byss/KBJSValueCoding), support was added for nested structs and arrays and tests added.
