@@ -115,7 +115,7 @@ extension JSValueDecoder {
         }
 
         func decode(_: Bool.Type, forKey key: Key) -> Bool {
-            return decodeValue(forKey: key).isNull
+            return decodeValue(forKey: key).toBool()
         }
 
         func decode(_: String.Type, forKey key: Key) -> String {
