@@ -39,6 +39,48 @@ final class JSValueCoderTests: XCTestCase {
         )
     }
     
+    func testKeyedUUID() throws {
+        struct Value: Codable, Equatable {
+            let uuid: UUID
+        }
+        
+        try assertDecoderSucceeds(
+            type: Value.self,
+            value: Value(
+                uuid: UUID()
+            )
+        )
+    }
+    
+    func testKeyedURL() throws {
+        struct Value: Codable, Equatable {
+            let url: URL
+        }
+        
+        try assertDecoderSucceeds(
+            type: Value.self,
+            value: Value(
+                url: URL(string: "https://github.com")!
+            )
+        )
+    }
+    
+    func testKeyedEnum() throws {
+        enum Nested: String, Codable, Equatable {
+            case first
+            case second
+        }
+        struct Value: Codable, Equatable {
+            let `enum`: Nested
+        }
+        try assertDecoderSucceeds(
+            type: Value.self,
+            value: Value(
+                enum: .first
+            )
+        )
+    }
+    
     func testKeyedDate() throws {
         struct Value: Codable, Equatable {
             let date: Date
@@ -144,7 +186,14 @@ final class JSValueCoderTests: XCTestCase {
         try assertDecoderSucceeds(
             type: Value.self,
             value: Value(
-                int8: 3
+                int8: Int8.max
+            )
+        )
+        
+        try assertDecoderSucceeds(
+            type: Value.self,
+            value: Value(
+                int8: Int8.min
             )
         )
     }
@@ -275,6 +324,13 @@ final class JSValueCoderTests: XCTestCase {
         try assertDecoderSucceeds(
             type: [String].self,
             value: ["Hello", "World"]
+        )
+    }
+    
+    func testUnkeyedOptionalString() throws {
+        try assertDecoderSucceeds(
+            type: [String?].self,
+            value: ["Hello", "World", nil]
         )
     }
     

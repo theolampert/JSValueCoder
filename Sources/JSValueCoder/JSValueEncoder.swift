@@ -9,12 +9,12 @@ import Foundation
 import JavaScriptCore
 
 extension JSValueEncoder {
-    final class Encoder {
+    public final class Encoder {
         let context: JSContext
         let keyEncodingStrategy: KeyEncodingStrategy
 
-        let codingPath: [CodingKey]
-        let userInfo: [CodingUserInfoKey: Any]
+        public let codingPath: [CodingKey]
+        public let userInfo: [CodingUserInfoKey: Any]
 
         var result: JSValue {
             get {
@@ -42,7 +42,12 @@ extension JSValueEncoder {
             keyEncodingStrategy: KeyEncodingStrategy,
             userInfo: [CodingUserInfoKey: Any]
         ) {
-            self.init(context: context, keyEncodingStrategy: keyEncodingStrategy, codingPath: [], userInfo: userInfo)
+            self.init(
+                context: context,
+                keyEncodingStrategy: keyEncodingStrategy,
+                codingPath: [],
+                userInfo: userInfo
+            )
         }
 
         convenience init(parent: Encoder, key: CodingKey) {
@@ -69,21 +74,21 @@ extension JSValueEncoder {
 }
 
 extension JSValueEncoder.Encoder: Encoder {
-    func container<Key>(keyedBy _: Key.Type) -> KeyedEncodingContainer<Key> where Key: CodingKey {
+    public func container<Key>(keyedBy _: Key.Type) -> KeyedEncodingContainer<Key> where Key: CodingKey {
         if resultStorage == nil {
             result = JSValue(newObjectIn: context)
         }
         return KeyedEncodingContainer(JSValueEncoder.KeyedEncodingContainer(self))
     }
 
-    func unkeyedContainer() -> UnkeyedEncodingContainer {
+    public func unkeyedContainer() -> UnkeyedEncodingContainer {
         if resultStorage == nil {
             result = JSValue(newArrayIn: context)
         }
         return JSValueEncoder.UnkeyedEncodingContainer(self)
     }
 
-    func singleValueContainer() -> SingleValueEncodingContainer {
+    public func singleValueContainer() -> SingleValueEncodingContainer {
         return JSValueEncoder.SingleValueEncodingContainer(self)
     }
 

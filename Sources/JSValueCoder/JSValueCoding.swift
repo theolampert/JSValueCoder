@@ -8,15 +8,15 @@
 import Foundation
 import JavaScriptCore
 
-open class JSValueEncoder {
+public final class JSValueEncoder {
     public typealias KeyEncodingStrategy = JSONEncoder.KeyEncodingStrategy
 
-    open var keyEncodingStrategy = KeyEncodingStrategy.useDefaultKeys
-    open var userInfo = [CodingUserInfoKey: Any]()
+    public var keyEncodingStrategy = KeyEncodingStrategy.useDefaultKeys
+    public var userInfo = [CodingUserInfoKey: Any]()
 
     public init() {}
 
-    open func encode<T>(
+    public func encode<T>(
         _ value: T,
         in context: JSContext
     ) throws -> JSValue where T: Encodable {
@@ -30,15 +30,15 @@ open class JSValueEncoder {
     }
 }
 
-open class JSValueDecoder {
+public final class JSValueDecoder {
     public typealias KeyDecodingStrategy = JSONDecoder.KeyDecodingStrategy
 
-    open var keyDecodingStrategy = KeyDecodingStrategy.useDefaultKeys
-    open var userInfo = [CodingUserInfoKey: Any]()
+    public var keyDecodingStrategy = KeyDecodingStrategy.useDefaultKeys
+    public var userInfo = [CodingUserInfoKey: Any]()
 
     public init() {}
 
-    open func decode<T>(
+    public func decode<T>(
         _ type: T.Type = T.self,
         from value: JSValue
     ) throws -> T where T: Decodable {

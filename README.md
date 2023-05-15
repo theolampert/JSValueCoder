@@ -5,6 +5,7 @@
 Codable implementation for JavascriptCore's `JSValue`
 
 #### Usage:
+
 ```swift
 let context = JSContext()!
 
@@ -28,6 +29,11 @@ let jsValue = try encoder.encode(user, in: context)
 let decoded = try decoder.decode(User.self, from: jsValue)
 ```
 
-
 #### Notes:
-This was based off of work done here [here](https://github.com/byss/KBJSValueCoding), support was added for nested structs and arrays and tests added.
+
+This was originally based off of work here https://github.com/byss/KBJSValueCoding with the following changes:
+
+- Support was added for nested structs
+- Support was added for arrays
+- Bug was fixed when decoding Bools
+- Tests added
