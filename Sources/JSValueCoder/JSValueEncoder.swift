@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  JSValueEncoder.swift
 //
 //
 //  Created by Theodore Lampert on 13.05.23.

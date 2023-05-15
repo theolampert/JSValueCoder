@@ -1,6 +1,6 @@
 import XCTest
 import JavaScriptCore
-@testable import JSValueCoder
+import JSValueCoder
 
 final class JSValueCoderTests: XCTestCase {
     
@@ -24,6 +24,8 @@ final class JSValueCoderTests: XCTestCase {
         )
     }
     
+    // MARK: - Keyed
+    
     func testKeyedString() throws {
         struct Value: Codable, Equatable {
             let string: String
@@ -33,6 +35,24 @@ final class JSValueCoderTests: XCTestCase {
             type: Value.self,
             value: Value(
                 string: "Hello"
+            )
+        )
+    }
+    
+    func testKeyedDate() throws {
+        struct Value: Codable, Equatable {
+            let date: Date
+        }
+
+        let input = "2023-05-15T07:07:46Z"
+
+        let formatter = ISO8601DateFormatter()
+        let date = formatter.date(from: input)!
+        
+        try assertDecoderSucceeds(
+            type: Value.self,
+            value: Value(
+                date: date
             )
         )
     }
@@ -157,13 +177,26 @@ final class JSValueCoderTests: XCTestCase {
     
     func testKeyedInt64() throws {
         struct Value: Codable, Equatable {
-            let float: Float
+            let int64: Int64
         }
         
         try assertDecoderSucceeds(
             type: Value.self,
             value: Value(
-                float: 3.8
+                int64: -8876
+            )
+        )
+    }
+    
+    func testKeyedUint() throws {
+        struct Value: Codable, Equatable {
+            let uint: UInt
+        }
+        
+        try assertDecoderSucceeds(
+            type: Value.self,
+            value: Value(
+                uint: 2
             )
         )
     }
@@ -183,13 +216,26 @@ final class JSValueCoderTests: XCTestCase {
     
     func testKeyedUint16() throws {
         struct Value: Codable, Equatable {
-            let uni16: UInt8
+            let uni16: UInt16
         }
         
         try assertDecoderSucceeds(
             type: Value.self,
             value: Value(
                 uni16: 9
+            )
+        )
+    }
+    
+    func testKeyedUint64() throws {
+        struct Value: Codable, Equatable {
+            let uni64: UInt64
+        }
+        
+        try assertDecoderSucceeds(
+            type: Value.self,
+            value: Value(
+                uni64: 9998
             )
         )
     }
@@ -210,6 +256,21 @@ final class JSValueCoderTests: XCTestCase {
         )
     }
     
+    func testKeyedStrings() throws {
+        struct Value: Codable, Equatable {
+            let strings: [String]
+        }
+        
+        try assertDecoderSucceeds(
+            type: Value.self,
+            value: Value(
+                strings: ["Hello", "World"]
+            )
+        )
+    }
+    
+    // MARK: - Unkeyed
+    
     func testUnkeyedString() throws {
         try assertDecoderSucceeds(
             type: [String].self,
@@ -217,9 +278,72 @@ final class JSValueCoderTests: XCTestCase {
         )
     }
     
+    func testUnkeyedBool() throws {
+        try assertDecoderSucceeds(
+            type: [Bool].self,
+            value: [true, false]
+        )
+    }
+    
     func testUnkeyedInt() throws {
         try assertDecoderSucceeds(
             type: [Int].self,
+            value: [10, 30]
+        )
+    }
+    
+    func testUnkeyedInt8() throws {
+        try assertDecoderSucceeds(
+            type: [Int8].self,
+            value: [10, 30]
+        )
+    }
+    
+    func testUnkeyedInt16() throws {
+        try assertDecoderSucceeds(
+            type: [Int16].self,
+            value: [10, 30]
+        )
+    }
+    
+    func testUnkeyedInt32() throws {
+        try assertDecoderSucceeds(
+            type: [Int32].self,
+            value: [10, 30]
+        )
+    }
+    
+    func testUnkeyedInt64() throws {
+        try assertDecoderSucceeds(
+            type: [Int64].self,
+            value: [10, 30]
+        )
+    }
+    
+    func testUnkeyedUInt() throws {
+        try assertDecoderSucceeds(
+            type: [UInt].self,
+            value: [10, 30]
+        )
+    }
+    
+    func testUnkeyedUint8() throws {
+        try assertDecoderSucceeds(
+            type: [UInt8].self,
+            value: [10, 30]
+        )
+    }
+    
+    func testUnkeyedUInt16() throws {
+        try assertDecoderSucceeds(
+            type: [UInt16].self,
+            value: [10, 30]
+        )
+    }
+    
+    func testUnkeyedUInt64() throws {
+        try assertDecoderSucceeds(
+            type: [UInt64].self,
             value: [10, 30]
         )
     }
@@ -238,10 +362,32 @@ final class JSValueCoderTests: XCTestCase {
         )
     }
     
-    func testUnkeyedBool() throws {
+    func testUnkeyedDate() throws {
+        
+        let input = "2023-05-15T07:07:46Z"
+
+        let formatter = ISO8601DateFormatter()
+        let date = formatter.date(from: input)!
+        
         try assertDecoderSucceeds(
-            type: [Bool].self,
-            value: [true, false]
+            type: [Date].self,
+            value: [date, date, date]
+        )
+    }
+    
+    func testUnkeyedNested() throws {
+        struct Nested: Codable, Equatable {
+            let string: String
+        }
+        
+        let value: [Nested] = [
+            Nested(string: "Hello"),
+            Nested(string: "World")
+        ]
+        
+        try assertDecoderSucceeds(
+            type: [Nested].self,
+            value: value
         )
     }
 }
