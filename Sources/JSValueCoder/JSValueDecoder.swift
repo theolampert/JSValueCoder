@@ -9,14 +9,14 @@ import Foundation
 import JavaScriptCore
 
 extension JSValueDecoder {
-    final class Decoder {
+    struct Decoder {
         let value: JSValue
         let keyDecodingStrategy: KeyDecodingStrategy
 
         var codingPath: [CodingKey]
         let userInfo: [CodingUserInfoKey: Any]
 
-        convenience init(
+        init(
             value: JSValue,
             keyDecodingStrategy: KeyDecodingStrategy,
             userInfo: [CodingUserInfoKey: Any]
@@ -29,11 +29,11 @@ extension JSValueDecoder {
             )
         }
 
-        convenience init(parent: Decoder, key: CodingKey) {
+        init(parent: Decoder, key: CodingKey) {
             self.init(parent: parent, value: parent.value, key: key)
         }
 
-        convenience init(parent: Decoder, value: JSValue, key: CodingKey) {
+        init(parent: Decoder, value: JSValue, key: CodingKey) {
             self.init(
                 value: value,
                 keyDecodingStrategy: parent.keyDecodingStrategy,
@@ -86,7 +86,7 @@ extension JSValueDecoder.Decoder: Decoder {
 extension JSValueDecoder {
     struct KeyedDecodingContainer<Key>: KeyedDecodingContainerProtocol where Key: CodingKey {
         var allKeys: [Key] {
-            return value
+            return decoder.value
                 .toDictionary()!
                 .keys
                 .compactMap { ($0 as? String).flatMap(Key.init) }
@@ -96,10 +96,6 @@ extension JSValueDecoder {
             return decoder.codingPath
         }
 
-        private var value: JSValue {
-            return decoder.value
-        }
-
         private let decoder: Decoder
 
         init(_ decoder: Decoder) {
@@ -107,7 +103,7 @@ extension JSValueDecoder {
         }
 
         func contains(_ key: Key) -> Bool {
-            return value.hasProperty(decoder.decodedKey(key).stringValue)
+            return decoder.value.hasProperty(decoder.decodedKey(key).stringValue)
         }
 
         func decodeNil(forKey key: Key) -> Bool {
@@ -209,7 +205,7 @@ extension JSValueDecoder {
         }
 
         private func decodeValue(forKey key: Key) -> JSValue {
-            return value.forProperty(
+            return decoder.value.forProperty(
                 decoder.decodedKey(key).stringValue
             )
         }
@@ -222,9 +218,7 @@ private extension JSValueDecoder {
             return decoder.codingPath
         }
 
-        var count: Int? {
-            return Int(value.forProperty("length").toInt32())
-        }
+        let count: Int?
 
         var isAtEnd: Bool {
             return currentIndex >= count!
@@ -232,9 +226,7 @@ private extension JSValueDecoder {
 
         private(set) var currentIndex: Int = 0
 
-        private var value: JSValue {
-            return decoder.value
-        }
+        private var value: JSValue
 
         private var currentKey: CodingKey {
             return JSValueCodingKey(intValue: currentIndex)
@@ -244,6 +236,8 @@ private extension JSValueDecoder {
 
         init(_ decoder: Decoder) {
             self.decoder = decoder
+            self.count = Int(decoder.value.forProperty("length").toInt32())
+            self.value = decoder.value
         }
 
         mutating func decodeNil() -> Bool {
@@ -336,7 +330,7 @@ private extension JSValueDecoder {
             return Decoder(parent: decoder, key: JSValueCodingKey.super)
         }
 
-        private mutating func decodeNext() -> JSValue {
+        mutating private func decodeNext() -> JSValue {
             defer { self.currentIndex += 1 }
             return value.atIndex(currentIndex)
         }

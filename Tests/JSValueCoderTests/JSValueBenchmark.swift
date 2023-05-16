@@ -6,12 +6,19 @@
 //
 
 import XCTest
-import Foundation
+//import Foundation
 import JavaScriptCore
 import JSValueCoder
 
 final class JSValueBenchmark: XCTestCase {
+    enum State: Codable, Equatable {
+        case open
+        case closed
+        case loading
+    }
+    
     struct Point: Codable, Equatable {
+        let id: UUID
         let x: Double
         let y: Double
     }
@@ -22,10 +29,17 @@ final class JSValueBenchmark: XCTestCase {
         let createdAt: Date
         let updatedAt: Date
         let shape: [Point]
+        let visibility: Int8
+        let score: Int
+    }
+    
+    struct Container: Codable, Equatable {
+        let id: UUID
+        let shapes: [Shape]
     }
     
     lazy var shapes: [Shape] = {
-        let totalShapes = 15000
+        let totalShapes = 1400
         let totalPoints = 10
         return (0...totalShapes).map { int in
             return Shape(
@@ -33,9 +47,15 @@ final class JSValueBenchmark: XCTestCase {
                 name: "Shape",
                 createdAt: Date(),
                 updatedAt: Date(),
-                shape: (0...totalPoints).map { _ in Point(x: 1.5, y: 16.3) }
+                shape: (0...totalPoints).map { _ in Point(id: UUID(), x: 1.5, y: 16.3) },
+                visibility: 2,
+                score: int
             )
         }
+    }()
+    
+    lazy var container: Container = {
+        Container(id: UUID(), shapes: shapes)
     }()
 
     func testCodableBenchmark() throws {
@@ -44,10 +64,10 @@ final class JSValueBenchmark: XCTestCase {
         let decoder = JSValueDecoder()
         
         measure {
-            let encoded: JSValue = try! encoder.encode(shapes, in: context)
+            let encoded: JSValue = try! encoder.encode(container, in: context)
             context.setObject(encoded, forKeyedSubscript: "data" as NSString & NSCopying)
             let res = context.evaluateScript("data")!
-            _ = try! decoder.decode([Shape].self, from: res)
+            _ = try! decoder.decode(Container.self, from: res)
         }
     }
     
@@ -57,17 +77,16 @@ final class JSValueBenchmark: XCTestCase {
         let decoder = JSONDecoder()
 
         measure {
-            let encoded: Data = try! encoder.encode(shapes)
+            let encoded: Data = try! encoder.encode(container)
             context.setObject(
                 String(data: encoded, encoding: .utf8),
                 forKeyedSubscript: "data" as NSString & NSCopying
             )
             context.evaluateScript("""
-            data = JSON.parse(data)
-            data = JSON.stringify(data)
+            data = JSON.stringify(JSON.parse(data))
             """)
             let res = context.evaluateScript("data")!.toString()!
-            _ = try! decoder.decode([Shape].self, from: res.data(using: .utf8)!)
+            _ = try! decoder.decode(Container.self, from: res.data(using: .utf8)!)
         }
     }
 }

@@ -16,24 +16,7 @@ extension JSValueEncoder {
         public let codingPath: [CodingKey]
         public let userInfo: [CodingUserInfoKey: Any]
 
-        var result: JSValue {
-            get {
-                guard let result = resultStorage else {
-                    fatalError(
-                        "container <Key> (keyedBy type: Key.Type), unkeyedContainer () or singleValueContainer () was never called"
-                    )
-                }
-                return result
-            }
-            set {
-                guard resultStorage == nil else {
-                    fatalError(
-                        "container <Key> (keyedBy type: Key.Type), unkeyedContainer () or singleValueContainer () was already called earlier"
-                    )
-                }
-                resultStorage = newValue
-            }
-        }
+        var result: JSValue!
 
         private var resultStorage: JSValue?
 
@@ -114,40 +97,32 @@ extension JSValueEncoder {
 
         private let encoder: Encoder
 
-        private var target: JSValue {
-            return encoder.result
-        }
-
-        private var context: JSContext {
-            return encoder.context
-        }
-
         init(_ encoder: Encoder) {
             self.encoder = encoder
         }
 
         func encodeNil(forKey key: Key) {
-            encode(JSValue(nullIn: context), forKey: key)
+            encode(JSValue(nullIn: self.encoder.context), forKey: key)
         }
 
         func encode(_ value: Bool, forKey key: Key) {
-            encode(JSValue(bool: value, in: context), forKey: key)
+            encode(JSValue(bool: value, in: self.encoder.context), forKey: key)
         }
 
         func encode(_ value: String, forKey key: Key) {
-            encode(JSValue(object: value, in: context), forKey: key)
+            encode(JSValue(object: value, in: self.encoder.context), forKey: key)
         }
 
         func encode(_ value: Double, forKey key: Key) {
-            encode(JSValue(double: value, in: context), forKey: key)
+            encode(JSValue(double: value, in: self.encoder.context), forKey: key)
         }
 
         func encode(_ value: Int32, forKey key: Key) {
-            encode(JSValue(int32: value, in: context), forKey: key)
+            encode(JSValue(int32: value, in: self.encoder.context), forKey: key)
         }
 
         func encode(_ value: UInt32, forKey key: Key) {
-            encode(JSValue(uInt32: value, in: context), forKey: key)
+            encode(JSValue(uInt32: value, in: self.encoder.context), forKey: key)
         }
 
         func encode(_ value: Float, forKey key: Key) {
@@ -189,7 +164,7 @@ extension JSValueEncoder {
         func encode<T>(_ value: T, forKey key: Key) throws where T: Encodable {
             switch value {
             case let date as Date:
-                encode(JSValue(object: date, in: context), forKey: key)
+                encode(JSValue(object: date, in: self.encoder.context), forKey: key)
             case let value:
                 let encoder = Encoder(parent: self.encoder, key: key)
                 try value.encode(to: encoder)
@@ -197,26 +172,26 @@ extension JSValueEncoder {
             }
         }
 
-        mutating func nestedContainer<NestedKey>(keyedBy keyType: NestedKey.Type, forKey key: Key) -> Swift
+        func nestedContainer<NestedKey>(keyedBy keyType: NestedKey.Type, forKey key: Key) -> Swift
             .KeyedEncodingContainer<NestedKey> where NestedKey: CodingKey
         {
             return Encoder(parent: encoder, key: key).container(keyedBy: keyType)
         }
 
-        mutating func nestedUnkeyedContainer(forKey key: Key) -> Swift.UnkeyedEncodingContainer {
+        func nestedUnkeyedContainer(forKey key: Key) -> Swift.UnkeyedEncodingContainer {
             return Encoder(parent: encoder, key: key).unkeyedContainer()
         }
 
-        mutating func superEncoder() -> Swift.Encoder {
+        func superEncoder() -> Swift.Encoder {
             return Encoder(parent: encoder, key: JSValueCodingKey.super)
         }
 
-        mutating func superEncoder(forKey key: Key) -> Swift.Encoder {
+        func superEncoder(forKey key: Key) -> Swift.Encoder {
             return Encoder(parent: encoder, key: key)
         }
 
         private func encode(_ jsValue: JSValue, forKey key: Key) {
-            target.setValue(jsValue, forProperty: encoder.encodedKey(key).stringValue)
+            encoder.result.setValue(jsValue, forProperty: encoder.encodedKey(key).stringValue)
         }
     }
 }
@@ -348,36 +323,32 @@ extension JSValueEncoder {
 
         private let encoder: Encoder
 
-        private var context: JSContext {
-            return encoder.context
-        }
-
         init(_ encoder: Encoder) {
             self.encoder = encoder
         }
 
         func encodeNil() {
-            encode(JSValue(nullIn: context))
+            encode(JSValue(nullIn: encoder.context))
         }
 
         func encode(_ value: Bool) {
-            encode(JSValue(bool: value, in: context))
+            encode(JSValue(bool: value, in: encoder.context))
         }
 
         func encode(_ value: String) {
-            encode(JSValue(object: value, in: context))
+            encode(JSValue(object: value, in: encoder.context))
         }
 
         func encode(_ value: Double) {
-            encode(JSValue(double: value, in: context))
+            encode(JSValue(double: value, in: encoder.context))
         }
 
         func encode(_ value: Int32) {
-            encode(JSValue(int32: value, in: context))
+            encode(JSValue(int32: value, in: encoder.context))
         }
 
         func encode(_ value: UInt32) {
-            encode(JSValue(uInt32: value, in: context))
+            encode(JSValue(uInt32: value, in: encoder.context))
         }
 
         func encode(_ value: Float) {
@@ -419,7 +390,7 @@ extension JSValueEncoder {
         func encode<T>(_ value: T) throws where T: Encodable {
             switch value {
             case let date as Date:
-                encode(JSValue(object: date, in: context))
+                encode(JSValue(object: date, in: encoder.context))
             case let value:
                 try value.encode(to: encoder)
             }
