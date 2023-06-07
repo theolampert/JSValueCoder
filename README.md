@@ -9,6 +9,10 @@ Codable implementation for JavascriptCore's `JSValue`
 ```swift
 let context = JSContext()!
 
+struct Note: Codable {
+    let id: Int
+}
+
 struct User: Codable {
     let id: String
     let name: String
