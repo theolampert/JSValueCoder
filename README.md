@@ -40,4 +40,5 @@ This was originally based off of work here https://github.com/byss/KBJSValueCodi
 - Support was added for nested structs
 - Support was added for arrays
 - Bug was fixed when decoding Bools
+- Bug was fixed when decoding with different key coding strategies
 - Tests added

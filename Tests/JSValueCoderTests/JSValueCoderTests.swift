@@ -4,15 +4,19 @@ import JSValueCoder
 
 final class JSValueCoderTests: XCTestCase {
     
-    private func assertDecoderSucceeds<T: Codable & Equatable>(
+    private func assertCoderSucceeds<T: Codable & Equatable>(
         type: T.Type,
         value: T,
+        encodingKeys: JSONEncoder.KeyEncodingStrategy = .useDefaultKeys,
+        decodingKeys: JSONDecoder.KeyDecodingStrategy = .useDefaultKeys,
         file: StaticString = #file,
         line: UInt = #line
     ) throws {
         let context = JSContext()!
         let encoder = JSValueEncoder()
+        encoder.keyEncodingStrategy = encodingKeys
         let decoder = JSValueDecoder()
+        decoder.keyDecodingStrategy = decodingKeys
 
         let encoded: JSValue = try encoder.encode(value, in: context)
         let decoded: T = try decoder.decode(type, from: encoded)
@@ -31,7 +35,7 @@ final class JSValueCoderTests: XCTestCase {
             let string: String
         }
         
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: Value.self,
             value: Value(
                 string: "Hello"
@@ -44,7 +48,7 @@ final class JSValueCoderTests: XCTestCase {
             let uuid: UUID
         }
         
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: Value.self,
             value: Value(
                 uuid: UUID()
@@ -57,7 +61,7 @@ final class JSValueCoderTests: XCTestCase {
             let url: URL
         }
         
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: Value.self,
             value: Value(
                 url: URL(string: "https://github.com")!
@@ -73,7 +77,7 @@ final class JSValueCoderTests: XCTestCase {
         struct Value: Codable, Equatable {
             let `enum`: Nested
         }
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: Value.self,
             value: Value(
                 enum: .first
@@ -91,7 +95,7 @@ final class JSValueCoderTests: XCTestCase {
         let formatter = ISO8601DateFormatter()
         let date = formatter.date(from: input)!
         
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: Value.self,
             value: Value(
                 date: date
@@ -104,14 +108,14 @@ final class JSValueCoderTests: XCTestCase {
             let bool: Bool
         }
         
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: Value.self,
             value: Value(
                 bool: false
             )
         )
         
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: Value.self,
             value: Value(
                 bool: true
@@ -124,14 +128,14 @@ final class JSValueCoderTests: XCTestCase {
             let double: Double
         }
         
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: Value.self,
             value: Value(
                 double: 3.8
             )
         )
         
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: Value.self,
             value: Value(
                 double: -943.9
@@ -144,7 +148,7 @@ final class JSValueCoderTests: XCTestCase {
             let float: Float
         }
         
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: Value.self,
             value: Value(
                 float: 3.8
@@ -157,7 +161,7 @@ final class JSValueCoderTests: XCTestCase {
             let float: Float?
         }
         
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: Value.self,
             value: Value(
                 float: nil
@@ -170,7 +174,7 @@ final class JSValueCoderTests: XCTestCase {
             let int: Int
         }
         
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: Value.self,
             value: Value(
                 int: 3
@@ -183,14 +187,14 @@ final class JSValueCoderTests: XCTestCase {
             let int8: Int8
         }
         
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: Value.self,
             value: Value(
                 int8: Int8.max
             )
         )
         
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: Value.self,
             value: Value(
                 int8: Int8.min
@@ -203,7 +207,7 @@ final class JSValueCoderTests: XCTestCase {
             let int16: Int16
         }
         
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: Value.self,
             value: Value(
                 int16: 93
@@ -216,7 +220,7 @@ final class JSValueCoderTests: XCTestCase {
             let int32: Int32
         }
         
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: Value.self,
             value: Value(
                 int32: 932
@@ -229,7 +233,7 @@ final class JSValueCoderTests: XCTestCase {
             let int64: Int64
         }
         
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: Value.self,
             value: Value(
                 int64: -8876
@@ -242,7 +246,7 @@ final class JSValueCoderTests: XCTestCase {
             let uint: UInt
         }
         
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: Value.self,
             value: Value(
                 uint: 2
@@ -255,7 +259,7 @@ final class JSValueCoderTests: XCTestCase {
             let uint8: UInt8
         }
         
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: Value.self,
             value: Value(
                 uint8: 2
@@ -268,7 +272,7 @@ final class JSValueCoderTests: XCTestCase {
             let uni16: UInt16
         }
         
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: Value.self,
             value: Value(
                 uni16: 9
@@ -281,7 +285,7 @@ final class JSValueCoderTests: XCTestCase {
             let uni64: UInt64
         }
         
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: Value.self,
             value: Value(
                 uni64: 9998
@@ -297,7 +301,7 @@ final class JSValueCoderTests: XCTestCase {
             let nested: Nested
         }
         
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: Value.self,
             value: Value(
                 nested: Nested(string: "Hello")
@@ -310,7 +314,7 @@ final class JSValueCoderTests: XCTestCase {
             let strings: [String]
         }
         
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: Value.self,
             value: Value(
                 strings: ["Hello", "World"]
@@ -321,98 +325,98 @@ final class JSValueCoderTests: XCTestCase {
     // MARK: - Unkeyed
     
     func testUnkeyedString() throws {
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: [String].self,
             value: ["Hello", "World"]
         )
     }
     
     func testUnkeyedOptionalString() throws {
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: [String?].self,
             value: ["Hello", "World", nil]
         )
     }
     
     func testUnkeyedBool() throws {
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: [Bool].self,
             value: [true, false]
         )
     }
     
     func testUnkeyedInt() throws {
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: [Int].self,
             value: [10, 30]
         )
     }
     
     func testUnkeyedInt8() throws {
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: [Int8].self,
             value: [10, 30]
         )
     }
     
     func testUnkeyedInt16() throws {
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: [Int16].self,
             value: [10, 30]
         )
     }
     
     func testUnkeyedInt32() throws {
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: [Int32].self,
             value: [10, 30]
         )
     }
     
     func testUnkeyedInt64() throws {
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: [Int64].self,
             value: [10, 30]
         )
     }
     
     func testUnkeyedUInt() throws {
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: [UInt].self,
             value: [10, 30]
         )
     }
     
     func testUnkeyedUint8() throws {
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: [UInt8].self,
             value: [10, 30]
         )
     }
     
     func testUnkeyedUInt16() throws {
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: [UInt16].self,
             value: [10, 30]
         )
     }
     
     func testUnkeyedUInt64() throws {
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: [UInt64].self,
             value: [10, 30]
         )
     }
     
     func testUnkeyedDouble() throws {
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: [Double].self,
             value: [5.4, 1.2]
         )
     }
     
     func testUnkeyedFloat() throws {
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: [Float].self,
             value: [5.4, 9.4, 12.1]
         )
@@ -425,7 +429,7 @@ final class JSValueCoderTests: XCTestCase {
         let formatter = ISO8601DateFormatter()
         let date = formatter.date(from: input)!
         
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: [Date].self,
             value: [date, date, date]
         )
@@ -441,9 +445,63 @@ final class JSValueCoderTests: XCTestCase {
             Nested(string: "World")
         ]
         
-        try assertDecoderSucceeds(
+        try assertCoderSucceeds(
             type: [Nested].self,
             value: value
+        )
+    }
+    
+    func testNestedDictStringKey() throws {
+        struct NestedDict: Codable, Equatable {
+            let kv: [String: String]
+        }
+        
+        let value = NestedDict(kv: ["key": "value"])
+        
+        try assertCoderSucceeds(
+            type: NestedDict.self,
+            value: value
+        )
+    }
+    
+    func testNestedDictIntKey() throws {
+        struct NestedDict: Codable, Equatable {
+            let kv: [Int: String]
+        }
+        
+        let value = NestedDict(kv: [1: "value"])
+        
+        try assertCoderSucceeds(
+            type: NestedDict.self,
+            value: value
+        )
+    }
+    
+    func testNestedDictUUIDKey() throws {
+        struct NestedDict: Codable, Equatable {
+            let kv: [UUID: String]
+        }
+        
+        let value = NestedDict(kv: [UUID(): "value"])
+        
+        try assertCoderSucceeds(
+            type: NestedDict.self,
+            value: value
+        )
+    }
+    
+    func testCodingKeys() throws {
+        struct Value: Codable, Equatable {
+            let myStringKey: String
+        }
+        
+        try assertCoderSucceeds(
+            type: Value.self,
+            value: Value(
+                myStringKey: "Hello"
+            ),
+            encodingKeys: .convertToSnakeCase,
+            decodingKeys: .convertFromSnakeCase
         )
     }
 }
